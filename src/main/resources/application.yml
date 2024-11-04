@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/Bookshop_POS
+    username: root
+    password: 20040730
+
+  jpa:
+    hibernate:
+      ddl-auto: create
