@@ -50,6 +50,7 @@ public class AdminServiceImpl implements AdminService {
             admin.setPassword(encryptionUtil.md5Hash(admin.getPassword()));
             repository.save(mapper.map(admin, AdminEntity.class));
         } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
     }
 
