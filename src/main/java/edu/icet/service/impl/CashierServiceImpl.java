@@ -30,7 +30,7 @@ public class CashierServiceImpl implements CashierService {
             String nextId = generateNextCashierId();
             cashier.setId(nextId);
 
-            //set current date
+            //set Assigned date
             cashier.setAssignedDate(LocalDate.now());
 
             //set isValid to true
@@ -94,6 +94,7 @@ public class CashierServiceImpl implements CashierService {
         Optional<CashierEntity> optionalCashier = repository.findById(id);
         if (optionalCashier.isPresent()) {
             CashierEntity cashierEntity = optionalCashier.get();
+            cashierEntity.setResignedDate(LocalDate.now());
             cashierEntity.setValid(false);
             repository.save(cashierEntity);
             return true;
