@@ -4,7 +4,6 @@ import edu.icet.dto.Employee;
 import edu.icet.entity.EmployeeEntity;
 import edu.icet.repository.EmployeeRepository;
 import edu.icet.service.EmployeeService;
-import edu.icet.util.EncryptionUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository repository;
     private final ModelMapper mapper;
-    private final EncryptionUtil encryptionUtil;
 
     @Override
     public void addEmployee(Employee employee) {
