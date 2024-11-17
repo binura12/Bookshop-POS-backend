@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +55,14 @@ public class SupplierServiceImpl implements SupplierService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<Supplier> getSuppliersByCategory(String category) {
+        return repository.findByProductCategoryAndIsValidTrue(category)
+                .stream()
+                .map(entity -> mapper.map(entity, Supplier.class))
+                .collect(Collectors.toList());
     }
 
     private String generateNextSupplierId() {

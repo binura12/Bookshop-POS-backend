@@ -9,4 +9,5 @@ public interface SupplierService {
     List<Supplier> getAllActiveSupplier();
     void updateSupplierById(Supplier supplier);
     boolean deactivateSupplier(String id);
+    List<Supplier> getSuppliersByCategory(String category);
 }

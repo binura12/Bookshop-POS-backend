@@ -1,8 +1,6 @@
 package edu.icet.controller;
 
-import edu.icet.dto.Employee;
 import edu.icet.dto.Supplier;
-import edu.icet.service.EmployeeService;
 import edu.icet.service.SupplierService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +26,6 @@ public class SupplierController {
         return service.getAllActiveSupplier();
     }
 
-    @GetMapping("/all-removed-suppliers")
-    public List<Supplier> getAllRemovedSuppliers() {
-        return service.getAllActiveSupplier();
-    }
-
     @DeleteMapping("/delete-supplier/{id}")
     public ResponseEntity<Boolean> deleteSupplierById(@PathVariable String id) {
         boolean deactivated = service.deactivateSupplier(id);
@@ -42,5 +35,10 @@ public class SupplierController {
     @PutMapping("/update-supplier")
     public void updateSupplier(@RequestBody Supplier supplier){
         service.updateSupplierById(supplier);
+    }
+
+    @GetMapping("/suppliers-by-category/{category}")
+    public List<Supplier> getSuppliersByCategory(@PathVariable String category) {
+        return service.getSuppliersByCategory(category);
     }
 }
