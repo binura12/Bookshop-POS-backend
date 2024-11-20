@@ -1,6 +1,7 @@
 package edu.icet.service.impl;
 
 import edu.icet.dto.Item;
+import edu.icet.dto.StockUpdate;
 import edu.icet.entity.ItemEntity;
 import edu.icet.entity.SupplierEntity;
 import edu.icet.repository.ItemRepository;
@@ -75,5 +76,15 @@ public class ItemServiceImpl implements ItemService {
                .stream()
                .map(entity -> mapper.map(entity, Item.class))
                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateStock(List<StockUpdate> updates) {
+        for (StockUpdate update : updates) {
+            ItemEntity item = repository.findById(update.getItemId())
+                    .orElseThrow(() -> new RuntimeException("Item not found"));
+            item.setQty(item.getQty() - update.getQuantity());
+            repository.save(item);
+        }
     }
 }

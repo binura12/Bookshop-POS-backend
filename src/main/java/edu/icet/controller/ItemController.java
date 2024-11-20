@@ -1,6 +1,7 @@
 package edu.icet.controller;
 
 import edu.icet.dto.Item;
+import edu.icet.dto.StockUpdate;
 import edu.icet.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,12 @@ public class ItemController {
     @PostMapping("/add-item")
     public void addItem(@RequestBody Item item){
         service.addItem(item);
+    }
+
+    @PostMapping("/update-stock")
+    public ResponseEntity<Void> updateStock(@RequestBody List<StockUpdate> updates) {
+        service.updateStock(updates);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/all-active-items")
