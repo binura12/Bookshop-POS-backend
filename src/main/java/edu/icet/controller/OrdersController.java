@@ -36,9 +36,9 @@ public class OrdersController {
         return ResponseEntity.ok(service.getAllInvalidOrders());
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable String id) {
-        service.deleteOrder(id);
+    @PutMapping("/return/{orderId}")
+    public ResponseEntity<Void> returnOrder(@PathVariable String orderId) {
+        service.returnOrder(orderId);
         return ResponseEntity.ok().build();
     }
 }
