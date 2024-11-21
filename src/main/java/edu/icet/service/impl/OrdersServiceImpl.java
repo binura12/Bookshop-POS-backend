@@ -1,8 +1,11 @@
 package edu.icet.service.impl;
 
+import edu.icet.dto.OrderItems;
 import edu.icet.dto.Orders;
+import edu.icet.entity.ItemEntity;
 import edu.icet.entity.OrderItemsEntity;
 import edu.icet.entity.OrdersEntity;
+import edu.icet.repository.ItemRepository;
 import edu.icet.repository.OrderItemsRepository;
 import edu.icet.repository.OrdersRepository;
 import edu.icet.service.OrdersService;
@@ -13,8 +16,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +27,7 @@ public class OrdersServiceImpl implements OrdersService {
 
     private final OrdersRepository orderRepository;
     private final OrderItemsRepository orderItemsRepository;
+    public final ItemRepository itemRepository;
     private final ModelMapper mapper;
 
     @Override
@@ -44,7 +50,7 @@ public class OrdersServiceImpl implements OrdersService {
         orderEntity.setOrderId(order.getOrderId());
         orderEntity.setCusName(order.getCusName());
         orderEntity.setOrderDate(LocalDate.now());
-        orderEntity.setOrderTime(LocalTime.now());
+        orderEntity.setOrderTime(LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
         orderEntity.setReturned(false);
         orderRepository.save(orderEntity);
 
@@ -65,16 +71,40 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public List<Orders> getAllValidOrders() {
-        return (List<Orders>) orderRepository.findAllByIsReturnedFalse();
+        List<OrdersEntity> orders = orderRepository.findAllByIsReturnedFalse();
+        return orders.stream()
+                .map(entity -> mapper.map(entity, Orders.class))
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<Orders> getAllInvalidOrders() {
-        return (List<Orders>) orderRepository.findAllByIsReturnedTrue();
+        List<OrdersEntity> orders = orderRepository.findAllByIsReturnedTrue();
+        return orders.stream()
+                .map(entity -> mapper.map(entity, Orders.class))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void deleteOrder(String orderId) {
-        orderRepository.deleteById(orderId);
+    public void returnOrder(String orderId) {
+        // Update order status
+        OrdersEntity order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setReturned(true);
+        orderRepository.save(order);
+
+        // Get order items and update their status
+        List<OrderItemsEntity> orderItems = orderItemsRepository.findByOrderIdAndIsReturnedFalse(orderId);
+        for (OrderItemsEntity item : orderItems) {
+            // Update order item status
+            item.setReturned(true);
+            orderItemsRepository.save(item);
+
+            // Restock the item
+            ItemEntity itemEntity = itemRepository.findById(item.getItemId())
+                    .orElseThrow(() -> new RuntimeException("Item not found"));
+            itemEntity.setQty(itemEntity.getQty() + item.getQuantity());
+            itemRepository.save(itemEntity);
+        }
     }
 }
