@@ -117,4 +117,20 @@ public class AdminServiceImpl implements AdminService {
         }
         return false;
     }
+
+    @Override
+    public boolean updatePasswordByEmail(String email, String newPassword) {
+        try {
+            Optional<AdminEntity> adminOptional = repository.findByEmail(email);
+            if (adminOptional.isPresent()) {
+                AdminEntity admin = adminOptional.get();
+                admin.setPassword(encryptionUtil.md5Hash(newPassword));
+                repository.save(admin);
+                return true;
+            }
+            return false;
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

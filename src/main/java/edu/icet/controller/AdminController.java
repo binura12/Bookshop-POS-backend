@@ -2,11 +2,15 @@ package edu.icet.controller;
 
 import edu.icet.dto.Admin;
 import edu.icet.service.AdminService;
+import edu.icet.service.impl.EmailService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -16,18 +20,19 @@ import java.util.Optional;
 public class AdminController {
 
     final AdminService service;
+    private final EmailService emailService;
 
-    @PostMapping ("/add-admin")
+    @PostMapping("/add-admin")
     public void addAdmin(@RequestBody Admin admin) {
         service.addAdmin(admin);
     }
 
-    @GetMapping ("/get-active-admins")
+    @GetMapping("/get-active-admins")
     public List<Admin> getAllActiveAdmins() {
         return service.getAllActiveAdmins();
     }
 
-    @GetMapping ("/get-removed-admins")
+    @GetMapping("/get-removed-admins")
     public List<Admin> getAllRemovedAdmins() {
         return service.getAllRemovedAdmins();
     }
@@ -53,7 +58,34 @@ public class AdminController {
     }
 
     @PutMapping("/update-admin")
-    public void updateAdmin(@RequestBody Admin admin){
+    public void updateAdmin(@RequestBody Admin admin) {
         service.updateAdminById(admin);
+    }
+
+    @GetMapping("/check-by-email/{email}")
+    public ResponseEntity<?> adminCheck(@PathVariable String email) {
+        try {
+            Admin admin = service.searchAdminByEmail(email);
+            if (admin != null) {
+                String otp = emailService.generateOTP();
+                emailService.sendOTPEmail(email, otp);
+                return ResponseEntity.ok(Map.of(
+                    "exists", true,
+                    "otp", otp
+                ));
+            }
+            return ResponseEntity.ok(Map.of("exists", false));
+        } catch (MessagingException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error sending email");
+        }
+    }
+
+    @PutMapping("/update-password")
+    public ResponseEntity<Boolean> updatePassword(@RequestParam String email, @RequestParam String newPassword) {
+        boolean updated = service.updatePasswordByEmail(email, newPassword);
+        if (updated) {
+            return ResponseEntity.ok(true);
+        }
+        return ResponseEntity.notFound().build();
     }
 }

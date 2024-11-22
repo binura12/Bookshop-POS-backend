@@ -13,4 +13,5 @@ public interface AdminService {
     Optional<Admin> findByEmailAndPassword(String email, String password);
     Admin searchAdminByEmail(String email);
     boolean deactivateAdmin(String id);
+    boolean updatePasswordByEmail(String email, String newPassword);
 }
