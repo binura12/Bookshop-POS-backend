@@ -18,6 +18,7 @@ public class Orders {
     private String cusName;
     private LocalDate orderDate;
     private LocalTime orderTime;
+    private LocalDate returnDate;
     private List<OrderItems> orderItems;
     private boolean isReturned;
 }

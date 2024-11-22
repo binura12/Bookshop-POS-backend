@@ -3,7 +3,6 @@ package edu.icet.service.impl;
 import edu.icet.dto.Item;
 import edu.icet.dto.StockUpdate;
 import edu.icet.entity.ItemEntity;
-import edu.icet.entity.SupplierEntity;
 import edu.icet.repository.ItemRepository;
 import edu.icet.service.ItemService;
 import lombok.RequiredArgsConstructor;

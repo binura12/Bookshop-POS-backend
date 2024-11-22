@@ -47,8 +47,15 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void updateAdminById(Admin admin) {
         try {
-            admin.setPassword(encryptionUtil.md5Hash(admin.getPassword()));
-            repository.save(mapper.map(admin, AdminEntity.class));
+            Optional<AdminEntity> existingAdmin = repository.findById(admin.getId());
+            if (existingAdmin.isPresent()){
+                AdminEntity adminEntity = existingAdmin.get();
+
+                if (!adminEntity.getPassword().equals(admin.getPassword())) {
+                    admin.setPassword(encryptionUtil.md5Hash(admin.getPassword()));
+                }
+                repository.save(mapper.map(admin, AdminEntity.class));
+            }
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }

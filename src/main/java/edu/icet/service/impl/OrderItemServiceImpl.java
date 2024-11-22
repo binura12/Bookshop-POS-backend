@@ -2,7 +2,6 @@ package edu.icet.service.impl;
 
 import edu.icet.dto.OrderItems;
 import edu.icet.repository.OrderItemsRepository;
-import edu.icet.repository.OrdersRepository;
 import edu.icet.service.OrderItemsService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;

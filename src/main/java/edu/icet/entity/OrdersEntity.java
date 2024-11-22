@@ -24,6 +24,7 @@ public class OrdersEntity {
     private String orderId;
     private String cusName;
     private LocalDate orderDate;
+    private LocalDate returnDate;
     private LocalTime orderTime;
     private boolean isReturned;
 }

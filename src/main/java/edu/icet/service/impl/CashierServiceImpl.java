@@ -66,8 +66,15 @@ public class CashierServiceImpl implements CashierService {
     @Override
     public void updateCashierById(Cashier cashier) {
         try {
-            cashier.setPassword(encryptionUtil.md5Hash(cashier.getPassword()));
-            repository.save(mapper.map(cashier, CashierEntity.class));
+            Optional<CashierEntity> existingCashier = repository.findById(cashier.getId());
+            if (existingCashier.isPresent()){
+                CashierEntity cashierEntity = existingCashier.get();
+
+                if (!cashierEntity.getPassword().equals(cashier.getPassword())) {
+                    cashier.setPassword(encryptionUtil.md5Hash(cashier.getPassword()));
+                }
+                repository.save(mapper.map(cashier, CashierEntity.class));
+            }
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }

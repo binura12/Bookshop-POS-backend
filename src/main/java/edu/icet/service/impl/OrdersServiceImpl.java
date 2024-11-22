@@ -1,6 +1,5 @@
 package edu.icet.service.impl;
 
-import edu.icet.dto.OrderItems;
 import edu.icet.dto.Orders;
 import edu.icet.entity.ItemEntity;
 import edu.icet.entity.OrderItemsEntity;
@@ -98,6 +97,7 @@ public class OrdersServiceImpl implements OrdersService {
         for (OrderItemsEntity item : orderItems) {
             // Update order item status
             item.setReturned(true);
+            order.setReturnDate(LocalDate.now());
             orderItemsRepository.save(item);
 
             // Restock the item
