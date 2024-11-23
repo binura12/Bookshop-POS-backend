@@ -2,11 +2,15 @@ package edu.icet.controller;
 
 import edu.icet.dto.Cashier;
 import edu.icet.service.CashierService;
+import edu.icet.service.impl.EmailService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -16,6 +20,7 @@ import java.util.Optional;
 public class CashierController {
 
     final CashierService service;
+    private final EmailService emailService;
 
     @PostMapping ("/add-cashier")
     public void addCashier(@RequestBody Cashier cashier) {
@@ -55,5 +60,32 @@ public class CashierController {
     @PutMapping("/update-cashier")
     public void updateCashier(@RequestBody Cashier cashier){
         service.updateCashierById(cashier);
+    }
+
+    @GetMapping("/check-by-email/{email}")
+    public ResponseEntity<?> cashierCheck(@PathVariable String email) {
+        try {
+            Cashier cashier = service.searchCashierByEmail(email);
+            if (cashier != null) {
+                String otp = emailService.generateOTP();
+                emailService.sendOTPEmail(email, otp);
+                return ResponseEntity.ok(Map.of(
+                    "exists", true,
+                    "otp", otp
+                ));
+            }
+            return ResponseEntity.ok(Map.of("exists", false));
+        } catch (MessagingException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error sending email");
+        }
+    }
+
+    @PutMapping("/update-password")
+    public ResponseEntity<Boolean> updatePassword(@RequestParam String email, @RequestParam String newPassword) {
+        boolean updated = service.updatePasswordByEmail(email, newPassword);
+        if (updated) {
+            return ResponseEntity.ok(true);
+        }
+        return ResponseEntity.notFound().build();
     }
 }

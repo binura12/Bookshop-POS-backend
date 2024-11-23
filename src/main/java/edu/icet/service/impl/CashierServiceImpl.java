@@ -109,6 +109,22 @@ public class CashierServiceImpl implements CashierService {
         return false;
     }
 
+    @Override
+    public boolean updatePasswordByEmail(String email, String newPassword) {
+        try {
+            Optional<CashierEntity> cashierOptional = repository.findByEmail(email);
+            if (cashierOptional.isPresent()) {
+                CashierEntity cashier = cashierOptional.get();
+                cashier.setPassword(encryptionUtil.md5Hash(newPassword));
+                repository.save(cashier);
+                return true;
+            }
+            return false;
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private String generateNextCashierId() {
         Optional<CashierEntity> lastCashier = repository.findFirstByOrderByIdDesc();
 

@@ -13,4 +13,5 @@ public interface CashierService {
     Optional<Cashier> findByEmailAndPassword(String email, String password);
     Cashier searchCashierByEmail(String email);
     boolean deactivateCashier(String id);
+    boolean updatePasswordByEmail(String email, String newPassword);
 }
